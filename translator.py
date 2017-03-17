@@ -20,8 +20,10 @@ with open("program.f90",'rb') as fi:
         	codeline=fi.readline()
 		if not codeline: break
 		tokens = codeline.split(" ")
+		if codeline == "\n":
+			fo.write("\n")
 		#if statement controls
-		if (tokens[0] == "IF") or (tokens[0] == "if"):
+		elif (tokens[0] == "IF") or (tokens[0] == "if"):
 			printtabs(f, index)
 			fo.write("if")
 			counter = 1
@@ -33,11 +35,11 @@ with open("program.f90",'rb') as fi:
 			elif (codeline[counter] == "EXIT") or (codeline[counter] == "exit"):
 				fo.write(": break\n")
 			index = index + 1
-		if (tokens[0] == "EXIT") or (tokens[0] == "exit"):
+		elif (tokens[0] == "EXIT") or (tokens[0] == "exit"):
 			fo.write("break\n")
-		if (tokens[0] == "CONTINUE") or (tokens[0] == "continue"):
+		elif (tokens[0] == "CONTINUE") or (tokens[0] == "continue"):
 			fo.write("continue\n")
-		if (tokens[0] == "ELSE") or (tokens[0] == "else"):
+		elif (tokens[0] == "ELSE") or (tokens[0] == "else"):
 			index = index - 1
 			printtabs(f, index)
 			fo.write("elif")
@@ -47,20 +49,20 @@ with open("program.f90",'rb') as fi:
 				counter = counter + 1
 			fo.write(":\n")
 			index = index + 1
-		if (tokens[0] == "ENDIF") or (tokens[0] == "endif"):
+		elif (tokens[0] == "ENDIF") or (tokens[0] == "endif"):
 			index = index - 1
 			printtabs(f, index)
 			fo.write(":\n")
 		#do loop controls
-		if (tokens[0] == "DO") or (tokens[0] == "do"):
+		elif (tokens[0] == "DO") or (tokens[0] == "do"):
 			printtabs(f, index)
 			fo.write("for ", tokens[2], " in range(", tokens[4], tokens[5], ":")
 			index = index + 1
-		if (tokens[0] == "ENDDO") or (tokens[0] == "enddo"):
+		elif (tokens[0] == "ENDDO") or (tokens[0] == "enddo"):
 			index = index - 1
 			printtabs(f, index)
 			fo.write("\n")
-		if (tokens[0] == "END") or (tokens[0] == "end"):
+		elif (tokens[0] == "END") or (tokens[0] == "end"):
 			#some loops use "end for" or "end do" rather than run together
 			index = index - 1
 			printtabs(f, index)
