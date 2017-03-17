@@ -19,10 +19,14 @@ with open("program.f90",'rb') as fi:
 	while True:
         	codeline=fi.readline()
 		if not codeline: break
-		tokens = codeline.split(" ")
+
+                tokens = codeline.split(" ")
+                                
+	        #if statement controls
+                
 		if codeline == "\n":
 			fo.write("\n")
-		#if statement controls
+
 		elif (tokens[0] == "IF") or (tokens[0] == "if"):
 			printtabs(f, index)
 			fo.write("if")
@@ -67,3 +71,32 @@ with open("program.f90",'rb') as fi:
 			index = index - 1
 			printtabs(f, index)
 			fo.write("\n")	
+                elif (tokens[0] == "select") or (tokens[0] == "SELECT"):
+                        selector = (tokens[2].split('(')).split(')')[0]
+                       
+                        
+                        while tokens[0] != "end" or tokens[0] != "END":
+                                codeline = fi.readline()
+                                tokens = codeline.split(" ")
+                                
+		                if codeline == "\n":
+			                fo.write("\n")
+
+                                elif "default" in tokens or "DEFAULT" in tokens:
+                                        fo.write("else: \n")
+                                        index += 1
+                                        
+                                elif tokens[0] == "case" or tokens[0] == "CASE":
+                                        case = (tokens[1].split('('))[1].split(')')[0]
+                                        index += 1
+                                        fo.write("if ", case," :\n")
+                                        #check for ranges
+                                else:
+                                        printtabs(f, index)
+                                        index -= 1
+                                        fo.write(token[0])
+
+                                        #need to check statement
+                                        #if it calls a function
+                                        #if it does arithmetic
+                                        #if it just sets equal to the variable then done
