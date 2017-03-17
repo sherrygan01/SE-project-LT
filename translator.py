@@ -17,7 +17,7 @@ fo = open("program.py", w)
 
 with open("program.f90",'rb') as fi:
 	while True:
-        	line=f.readline()
+        	line=fi.readline()
 		if not line: break
 		codeline = fi.getline()
 		tokens = codeline.split(" ")
