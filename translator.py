@@ -17,9 +17,8 @@ fo = open("program.py", w)
 
 with open("program.f90",'rb') as fi:
 	while True:
-        	line=fi.readline()
-		if not line: break
-		codeline = fi.getline()
+        	codeline=fi.readline()
+		if not codeline: break
 		tokens = codeline.split(" ")
 		#if statement controls
 		if (tokens[0] == "IF") or (tokens[0] == "if"):
