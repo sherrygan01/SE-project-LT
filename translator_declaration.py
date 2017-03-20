@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import re
 #function to print the tabs at the beginning of the lines
-def printtabs(f, i):
+def printtabs(fo, i):
 	if i < 1:
 		return
 	else:
@@ -11,13 +11,23 @@ def printtabs(f, i):
 
 #variables; fi should probably be set as a command line argument
 index = 0;
-fo = open("program.py", w)
+fo = open("program.py", 'w')
 
+#match the codeline whose key word do not know how to manage
+pat_ignore=re.compile(r"\s*USE|use|MODULE|module|IMPLICIT|implicit|program|PROGRAM|!\s*\.*")
+#match the codeline whose declaration without assigning value
+pat_declare=re.compile(r"\s*\S*\s*::\s*")
+#match the codeline whose declaration with assigning value
+pat_assign_dec=re.compile(r".*::.*=.*")
+#match the codeline whose assigning one value
+pat_assign_one=re.compile(r'\s*\w+\s*=\s*("(.*)"|\w*.|\w*)\s*\w*\s*') 
+#match the codeline include print statement
+pat_print=re.compile(r'print|PRINT|Print\s*(,)\w*')
 #getting the line and splitting it into tokens
 
 with open("program.f90",'rb') as fi:
 	while True:
-        codeline=fi.readline()
+		codeline=fi.readline()
 		if not codeline: break
 		tokens = codeline.split(" ")
 		codeline=codeline.replace("!","#").replace(".and.", "and").replace(".or.", "or").replace('not','not').replace('.true.',"true")
@@ -25,7 +35,7 @@ with open("program.f90",'rb') as fi:
 			fo.write("\n")
 		#if statement controls
 		elif (tokens[0] == "IF") or (tokens[0] == "if"):
-			printtabs(f, index)
+			printtabs(fo, index)
 			fo.write("if")
 			counter = 1
 			while (codeline[counter] != "THEN") and (codeline[counter] != "then") and (codeline[counter] != "EXIT") and (codeline[counter] != "exit"):
@@ -42,7 +52,7 @@ with open("program.f90",'rb') as fi:
 			fo.write("continue\n")
 		elif (tokens[0] == "ELSE") or (tokens[0] == "else"):
 			index = index - 1
-			printtabs(f, index)
+			printtabs(fo, index)
 			fo.write("elif")
 			counter = 2
 			while (codeline[counter] != "THEN") and (codeline[counter] != "then") and (codeline[counter] != "EXIT") and (codeline[counter] != "exit"):
@@ -52,21 +62,21 @@ with open("program.f90",'rb') as fi:
 			index = index + 1
 		elif (tokens[0] == "ENDIF") or (tokens[0] == "endif"):
 			index = index - 1
-			printtabs(f, index)
+			printtabs(fo, index)
 			fo.write(":\n")
 		#do loop controls
 		elif (tokens[0] == "DO") or (tokens[0] == "do"):
-			printtabs(f, index)
+			printtabs(fo, index)
 			fo.write("for ", tokens[2], " in range(", tokens[4], tokens[5], ":")
 			index = index + 1
 		elif (tokens[0] == "ENDDO") or (tokens[0] == "enddo"):
 			index = index - 1
-			printtabs(f, index)
+			printtabs(fo, index)
 			fo.write("\n")
 		elif (tokens[0] == "END") or (tokens[0] == "end"):
 			#some loops use "end for" or "end do" rather than run together
 			index = index - 1
-			printtabs(f, index)
+			printtabs(fo, index)
 			fo.write("\n")	
 			
 		elif (tokens[0] == "select") or (tokens[0] == "SELECT"):
@@ -90,16 +100,16 @@ with open("program.f90",'rb') as fi:
                                         fo.write("if ", case," :\n")
                                         #check for ranges
                                 else:
-                                        printtabs(f, index)
+                                        printtabs(fo, index)
                                         index -= 1
-                                        fo.write(token[0])
+                                        fo.write(tokens[0])
 
                                         #need to check statement
                                         #if it calls a function
                                         #if it does arithmetic
                                         #if it just sets equal to the variable then done	
                                         
-        elif pat_ignore.match(codeline): 
+  	    elif pat_ignore.match(codeline): 
         #declare program 
             if "PROGRAM" in codeline:
                 recodeline=codeline.replace("PROGRAM","def") 
@@ -123,7 +133,7 @@ with open("program.f90",'rb') as fi:
         # write assignment 
         elif pat_assign_dec.match(codeline):
             str=codeline.split("::")
-            printtabs(index)
+            printtabs(fo,index)
             fo.write(str[1].strip())
             fo.write('\n')
             continue
@@ -139,13 +149,13 @@ with open("program.f90",'rb') as fi:
             if "*" in codeline:
                 temptoken=codeline.split("print")
                 tempstr="print("+temptoken[1].replace("*","").replace(",","",1).strip()+")"
-                printtabs(index) 
+                printtabs(fo,index) 
                 fo.write(tempstr.strip())
                 fo.write('\n')
             else :
                 temptoken=codeline.split("print")
                 tempstr="print("+temptoken[1].strip()+")"
-                printtabs(index)       
+                printtabs(fo,index)       
                 fo.write(tempstr.strip())   
                 fo.write('\n')  
                 
